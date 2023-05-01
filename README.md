@@ -99,3 +99,4 @@ I am writing this fuzzer because I want to:
 ## FUTURE WORK AKA TODO
 1. Check the PID of the process if fuzzing locally for crash detection.
 2. Write new generators.
+3. Add a possibility to add a pattern file as an additional option for the --bytes flag.
