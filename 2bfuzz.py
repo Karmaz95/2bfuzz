@@ -3,6 +3,7 @@ import argparse
 import socket
 import os
 import subprocess
+import time
 
 ### PARSER ---
 def parse_args():
@@ -13,6 +14,7 @@ def parse_args():
     parser.add_argument('--bytes', '-b', action='store_true', help='2-bytes generator.')
     parser.add_argument('--radamsa', '-r', metavar='FILE', help='Radamsa generator with a given pattern stored in a file.')
     parser.add_argument('--count', '-c', type=str, help='Number of payloads to generate with Radamsa.')
+    parser.add_argument('--sleep', '-s', type=int, default=0, help='Number of seconds to wait between each connection while fuzzing.')
     return parser.parse_args()
 
 
@@ -44,9 +46,10 @@ def radamsa_generator(pattern_file, count=None, save_path=None):
 
 
 ### TCP FUZZING ---
-def tcp_handshake(ip, port):
+def tcp_handshake(ip, port, timeout=5):
     '''Connecting to the service on a given IP:PORT and initialize connection for sending payloads. If the port is opened, returns socket object, else returns None'''
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(timeout)  # Set timeout
     # SYN, SYN-ACK, and ACK steps of the three-way handshake
     result = sock.connect_ex((ip, port))
     if result == 0:
@@ -78,27 +81,29 @@ def tcp_fuzzer(ip,port,payload,last_payload):
         send_bytes(sock,payload)
         return payload
     else:
-        print(f"[+] The service is down. The last payload could crash it.\n\t Content of the last payload: {str(last_payload)}")
+        print(f"[+] The service is down. The last payload could crash it.\n\t Content of the last payload: {str(last_payload)}\n\t Content of the current payload: {str(payload)}:")
         exit(0)
 
 
-def two_bytes_fuzzer(ip,port):
+def two_bytes_fuzzer(ip,port,sleep_time):
     '''Fuzz the first two bytes using tcp_fuzzer engine (\x00-\xff\xff)'''
     if initial_check(ip,port):
         print(f"[+] Starting fuzzing first byte.")
         last_payload = b""
         for i in range(256):
             last_payload = tcp_fuzzer(ip,port,bytes([i]),last_payload)
+            time.sleep(sleep_time)
         print(f"[+] Starting fuzzing first 2 bytes.")
         for i in range(256):
             for j in range(256):
                 last_payload = tcp_fuzzer(ip,port,bytes([i,j]),last_payload) 
+                time.sleep(sleep_time)
     else:
         print(f"The service on: {ip}:{port} is down.")
         exit(0)
 
 
-def radamsa_fuzzer(ip,port,pattern_file):
+def radamsa_fuzzer(ip,port,pattern_file,sleep_time):
     '''Fuzz the target using the Radamsa engine.'''
     if initial_check(ip,port):
         print(f"[+] Starting fuzzing using Radamsa. Press CTRL+C to stop.")
@@ -107,6 +112,7 @@ def radamsa_fuzzer(ip,port,pattern_file):
             try:
                 payload = radamsa_generator(pattern_file)
                 last_payload = tcp_fuzzer(ip,port,payload,last_payload)
+                time.sleep(sleep_time)
             except KeyboardInterrupt:
                 print('[+] FUZZING INTERRUPTED BY THE USER')
                 exit(0)
@@ -131,11 +137,11 @@ def main():
         port = args.port
         # 2B fuzzing
         if args.bytes:
-            two_bytes_fuzzer(ip,port)
+            two_bytes_fuzzer(ip,port, args.sleep)
         # RADAMSA fuzzing
         if args.radamsa:
             pattern_file = args.radamsa
-            radamsa_fuzzer(ip,port,pattern_file)
+            radamsa_fuzzer(ip,port,pattern_file,args.sleep)
     elif args.generator is not None:
 ### GENERATOR PART
         save_path = args.generator
