@@ -59,7 +59,7 @@ Host:localhost:8000
 ```
 ## INSTALLATION
 ```
-git clone URL
+git clone https://github.com/Karmaz95/2bfuzz.git
 cd 2bfuzz
 pip install -r requirements.txt
 chmod +x 2bfuzz.py
