@@ -7,7 +7,7 @@
 ## USAGE
 ```
 ❯ 2bfuzz -h
-usage: 2bfuzz [-h] [--ip IP] [--port PORT] [--generator [path/to/save/]] [--bytes] [--radamsa FILE] [--count COUNT]
+usage: 2bfuzz [-h] [--ip IP] [--port PORT] [--generator [path/to/save/]] [--bytes] [--radamsa FILE] [--count COUNT] [--sleep COUNT]
 
 Options:
   -h Show this help message and exit
@@ -17,6 +17,7 @@ Options:
   -b 2-byte generator.
   -r Radamsa generator with a given pattern stored in a file.
   -c Number of payloads to generate with Radamsa.
+  -s Number of seconds to wait between each connection while fuzzing.
 ```
 ### 1. FUZZER
 * Fuzzing TCP server (`127.0.0.1:8000`) using `2-byte generator` and `Radamsa generator` with a `test_file` as a pattern.
