@@ -5,6 +5,7 @@
 * It also allows you to generate payloads and save them to a directory for further processing.
 
 ## USAGE
+You can see the example fuzzing scenario with a 2Bfuzz described here: [MEDIUM](https://karol-mazurek95.medium.com/tcp-fuzzing-with-2bfuzz-5f8644e10c43)
 ```
 ❯ 2bfuzz -h
 usage: 2bfuzz [-h] [--ip IP] [--port PORT] [--generator [path/to/save/]] [--bytes] [--radamsa FILE] [--count COUNT] [--sleep COUNT]
