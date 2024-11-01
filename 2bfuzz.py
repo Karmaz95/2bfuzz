@@ -81,7 +81,7 @@ def send_bytes(sock, payload, max_retries=3):
             print(f"[!] Send attempt {attempt + 1} failed: {e}")
             if attempt < max_retries - 1:
                 print("[*] Retrying connection...")
-                time.sleep(1)  # Wait before retry
+                #time.sleep(1)  # Wait before retry
                 sock = tcp_handshake(sock.getpeername()[0], sock.getpeername()[1])
                 if sock is None:
                     print("[!] Could not re-establish connection.")
@@ -115,7 +115,7 @@ def tcp_fuzzer(ip, port, payload, last_payload, max_retries=3, sleep_time=0):
             print(f"[!] Unexpected error during fuzzing: {e}")
             traceback.print_exc()
         
-        time.sleep(1)  # Wait before retry
+        #time.sleep(1)  # Wait before retry
     
     print(f"[+] The service might be down or unreachable. Last payload: {last_payload}")
     return last_payload
